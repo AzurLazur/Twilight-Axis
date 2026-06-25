@@ -2,6 +2,8 @@
 	//used by the basic ai controller /datum/ai_behavior/basic_melee_attack to determine how fast a mob can attack
 	var/melee_cooldown = CLICK_CD_MELEE
 	var/pain_threshold = 0
+	var/no_head_bounty = FALSE
+
 
 /mob/living/Initialize()
 	. = ..()
@@ -699,7 +701,6 @@
 
 /mob/living/verb/stop_pulling1()
 	set name = "Stop Pulling"
-	set category = "IC"
 	set hidden = 1
 	stop_pulling()
 
@@ -751,7 +752,6 @@
 
 /mob/living/proc/mob_sleep()
 	set name = "Sleep"
-	set category = "IC"
 	set hidden = 1
 	if(IsSleeping())
 		to_chat(src, span_warning("I am already sleeping!"))
@@ -767,7 +767,6 @@
 
 /mob/living/proc/lay_down()
 	set name = "Lay down"
-	set category = "IC"
 	set hidden = 1
 	if(stat)
 		return
@@ -779,7 +778,6 @@
 
 /mob/living/proc/stand_up()
 	set name = "Stand up"
-	set category = "IC"
 	set hidden = 1
 	if(stat)
 		return
@@ -798,7 +796,6 @@
 
 /mob/living/proc/toggle_rest()
 	set name = "Rest/Stand"
-	set category = "IC"
 	set hidden = 1
 	if(stat)
 		return
@@ -919,6 +916,7 @@
 		clear_alert("not_enough_oxy")
 		reload_fullscreen()
 		remove_client_colour(/datum/client_colour/monochrome)
+		set_sunder(0) //Just in case we didn't
 		// Add message about struggling to recall death circumstances
 		to_chat(src, "<span class='notice'><b>As you return to life, you struggle to recall the circumstances of your death...</b></span>")
 		to_chat(src, "<span class='italic'>Your memories of your final moments are hazy and fragmented.</span>")
@@ -945,6 +943,7 @@
 	SetParalyzed(0, FALSE)
 	SetSleeping(0, FALSE)
 	setStaminaLoss(0)
+	set_sunder(0)
 	SetUnconscious(0, FALSE)
 	if(should_update_mobility)
 		update_mobility()
@@ -963,6 +962,7 @@
 	setCloneLoss(0, 0)
 	remove_CC(FALSE)
 	set_disgust(0)
+	set_sunder(0)
 	set_nutrition(NUTRITION_LEVEL_FED + 50)
 	bodytemperature = BODYTEMP_NORMAL
 	set_blindness(0)
@@ -1114,11 +1114,14 @@
 				if(!blood_exists)
 					new /obj/effect/decal/cleanable/trail_holder(start)
 
+				var/source_color = get_blood_color() || BLOOD_COLOR_RED
 				for(var/obj/effect/decal/cleanable/trail_holder/TH in start)
 					if((!(newdir in TH.existing_dirs) || trail_type == "trails_1" || trail_type == "trails_2") && TH.existing_dirs.len <= 16) //maximum amount of overlays is 16 (all light & heavy directions filled)
 						TH.existing_dirs += newdir
 						TH.add_overlay(image('icons/effects/blood.dmi', trail_type, dir = newdir))
 						TH.transfer_mob_blood_dna(src)
+						TH.blood_color = source_color
+						TH.color = source_color
 
 /mob/living/carbon/human/makeTrail(turf/T)
 	if((NOBLOOD in dna.species.species_traits) || !bleed_rate || bleedsuppress)
@@ -1139,7 +1142,6 @@
 
 /mob/living/verb/resist()
 	set name = "Resist"
-	set category = "IC"
 	set hidden = 1
 	if(!can_resist() || surrendering)
 		return
@@ -1201,7 +1203,6 @@
 
 /mob/living/proc/submit(instant = FALSE)
 	set name = "Yield"
-	set category = "IC"
 	set hidden = 1
 	if(surrendering || stat)
 		return
@@ -1233,7 +1234,6 @@
 
 /mob/living/proc/toggle_compliance()
 	set name = "Toggle Compliance"
-	set category = "IC"
 	set hidden = 1
 
 	var/notifyme = TRUE
@@ -1458,7 +1458,7 @@
 		if(L.cmode && L.mobility_flags & MOBILITY_STAND && !L.restrained())
 			to_chat(src, span_warning("I can't take \the [what] off, they are too tense!"))
 			return
-		if(L.compliance || L.surrendering)
+		if(L.compliance || L.surrendering || HAS_TRAIT(L, TRAIT_ARMOR_BREAK))
 			surrender_mod = 0.5
 
 	if(!who.Adjacent(src))
@@ -1470,6 +1470,7 @@
 
 	to_chat(src, span_danger("I try to remove [who]'s [what.name]..."))
 	what.add_fingerprint(src)
+
 	var/strip_delayed = what.strip_delay
 	if(enhanced_strip)
 		strip_delayed = 0.1 SECONDS
@@ -1955,10 +1956,6 @@
 	if(A.action)
 		A.action.Remove(src)
 
-/mob/living/proc/add_abilities_to_panel()
-	for(var/obj/effect/proc_holder/A in abilities)
-		statpanel("[A.panel]",A.get_panel_text(),A)
-
 /mob/living/lingcheck()
 	return LINGHIVE_NONE
 
@@ -2236,6 +2233,66 @@
 					dist_text = "in the distance"
 			to_chat(src, span_notice("You spot a faint trail [dist_text] to the [dir_text]."))
 
+		var/trackskill = get_skill_level(/datum/skill/misc/tracking)
+		var/has_sleuth = HAS_TRAIT(src, TRAIT_SLEUTH)
+
+		if(trackskill >= SKILL_LEVEL_EXPERT || has_sleuth)
+			var/search_range = has_sleuth ? 7 : (trackskill + 1) // Up to 7 (full screen) w/ Legendary
+			var/turf_origin = get_turf(src)
+			var/turf_up_one	= get_step_multiz(turf_origin, UP)
+			var/turf_up_two
+			if(turf_up_one && (trackskill >= SKILL_LEVEL_MASTER || has_sleuth))
+				turf_up_two = get_step_multiz(turf_up_one, UP)
+			var/turf_up_three
+			if(turf_up_two && (trackskill >= SKILL_LEVEL_LEGENDARY || has_sleuth))
+				turf_up_three = get_step_multiz(turf_up_two, UP)	// We physically cannot go higher on dun world, so we don't. This is very niche already.
+
+			var/list/z_highlights
+			if(turf_up_one)
+				z_highlights = list()
+
+			#define ZTAG_ONE 1
+			#define ZTAG_TWO 2
+			#define ZTAG_THREE 3
+
+			if(turf_up_one)
+				for(var/mob/living/L in get_hearers_in_range(search_range, turf_up_one, RECURSIVE_CONTENTS_CLIENT_MOBS))
+					if((L.m_intent == MOVE_INTENT_SNEAK || HAS_TRAIT(src, TRAIT_LIGHT_STEP)) && !has_sleuth)
+						continue
+					var/turf/T = locate(L.x, L.y, src.z) // We'll want to highlight the turf on -our- z-level.
+					var/val = "[ZTAG_ONE]"
+					if(current_mark && current_mark == L)
+						val += "m"	// "1m" appended to icon state later on.
+					z_highlights[T] = val
+			
+			if(turf_up_two)
+				for(var/mob/living/L in get_hearers_in_range(search_range, turf_up_two, RECURSIVE_CONTENTS_CLIENT_MOBS))
+					if((L.m_intent == MOVE_INTENT_SNEAK || HAS_TRAIT(src, TRAIT_LIGHT_STEP)) && !has_sleuth)
+						continue
+					var/turf/T = locate(L.x, L.y, src.z) // We'll want to highlight the turf on -our- z-level.
+					var/val = "[ZTAG_TWO]"
+					if(current_mark && current_mark == L)
+						val += "m"	// "2m" appended to icon state later on.
+					z_highlights[T] = val
+
+			if(turf_up_three)
+				for(var/mob/living/L in get_hearers_in_range(search_range, turf_up_three, RECURSIVE_CONTENTS_CLIENT_MOBS))
+					if((L.m_intent == MOVE_INTENT_SNEAK || HAS_TRAIT(src, TRAIT_LIGHT_STEP)) && !has_sleuth)
+						continue
+					var/turf/T = locate(L.x, L.y, src.z) // We'll want to highlight the turf on -our- z-level.
+					var/val = "[ZTAG_THREE]"
+					if(current_mark && current_mark == L)
+						val += "m"	// "3m" appended to icon state later on.
+					z_highlights[T] = val
+			
+			if(length(z_highlights))
+				for(var/turf/T in z_highlights)
+					if(!T.density)
+						found_ping_someone_above(T, client, z_highlights[T])
+			
+			#undef ZTAG_ONE
+			#undef ZTAG_TWO
+			#undef ZTAG_THREE
 
 /proc/found_ping(atom/A, client/C, state)
 	if(!A || !C || !state)
@@ -2264,6 +2321,21 @@
 	IAtom.plane = 18
 	flick_overlay(IAtom, list(C), 30)
 
+/proc/found_ping_someone_above(turf/tloc, client/C, tag)
+	if(!C || !tloc || !tag)
+		return
+	var/image/I = image(icon = 'icons/effects/effects.dmi', loc = tloc, icon_state = "found_above[tag]", layer = 18)
+	if(!I)
+		return
+	I.alpha = 155
+	I.layer = 19
+	I.plane = 19
+	if(!I)
+		return
+	I.mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	flick_overlay(I, list(C), 30)
+
+
 /mob/proc/look_up()
 	return
 
@@ -2277,24 +2349,17 @@
 	if(!can_look_up())
 		return
 
-	var/turf/T = get_turf(src)
-	var/turf/ceiling = get_step_multiz(src, UP)
-	var/water_view = (istype(T, /turf/open/water) && istype(ceiling, /turf/open/water))
-
 	changeNext_move(CLICK_CD_MELEE)
 
-	if(water_view)
-		if(m_intent != MOVE_INTENT_SNEAK)
-			visible_message(span_info("[src] peers into the thickness of the water above [src.p_their()] head."))
-		else
-			to_chat(src, span_info("[src] peers into the thickness of the water above [src.p_their()] head."))
+	if(m_intent != MOVE_INTENT_SNEAK)
+		visible_message(span_info("[src] looks up."))
 	else
-		if(m_intent != MOVE_INTENT_SNEAK)
-			visible_message(span_info("[src] looks up."))
-		else
-			to_chat(src, span_info("[src] looks up."))
+		to_chat(src, span_info("[src] looks up."))
 
-	if(!ceiling)
+	var/turf/ceiling = get_step_multiz(src, UP)
+	var/turf/T = get_turf(src)
+
+	if(!ceiling)  //We are at the highest z-level.
 		if(T.can_see_sky())
 			switch(GLOB.forecast)
 				if("prerain")
@@ -2313,7 +2378,7 @@
 			do_time_change()
 		return
 		
-	else if(!istransparentturf(ceiling) && !water_view) 
+	else if(!istransparentturf(ceiling)) 
 		to_chat(src, span_warning("There is a ceiling above my head."))
 		return
 
@@ -2572,6 +2637,15 @@
 		)
 	SEND_SIGNAL(offered_item, COMSIG_OBJ_HANDED_OVER, src, offerer)
 	offerer.stop_offering_item()
+
+/mob/living/proc/strip_head_bounty()
+	no_head_bounty = TRUE
+
+/mob/living/carbon/strip_head_bounty()
+	. = ..()
+	var/obj/item/bodypart/head/head = get_bodypart(BODY_ZONE_HEAD)
+	if(istype(head))
+		head.no_head_bounty = TRUE
 
 /mob/living/proc/resist_leash()
 	return
