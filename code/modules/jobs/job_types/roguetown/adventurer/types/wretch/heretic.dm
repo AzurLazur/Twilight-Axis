@@ -318,7 +318,6 @@
         "Sewing Kit" =  /obj/item/repair_kit,
     )
 	extra_context = "This subclass gain the Wound Heal miracle and the Convert Heretic spell."
-	tempo_capable = FALSE
 
 
 /datum/outfit/job/roguetown/wretch/hereticspy
