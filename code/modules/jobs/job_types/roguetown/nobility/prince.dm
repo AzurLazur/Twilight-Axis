@@ -1,4 +1,4 @@
-	/datum/job/roguetown/prince
+/datum/job/roguetown/prince
 	title = "Prince"
 	f_title = "Princess"
 	flag = PRINCE
@@ -60,7 +60,7 @@
 			if(!istype(player.prefs.virtue_origin, /datum/virtue/origin/azuria) && !istype(player.prefs.virtue_origin, /datum/virtue/origin/grenzelhoft) && !istype(player.prefs.virtue_origin, /datum/virtue/origin/valorian) && !istype(player.prefs.virtue_origin, /datum/virtue/origin/hammerhold))
 				var/list/new_origins = list("Azuria" = /datum/virtue/origin/azuria, 
 				"Grenzelhoft" = /datum/virtue/origin/grenzelhoft,
-				"Valoria" = /datum/virtue/origin/valorian
+				"Valoria" = /datum/virtue/origin/valorian,
 				"Hammerhold" = /datum/virtue/origin/hammerhold)
 				var/new_origin
 				var/choice = input(player, "Your origins are not compatible with the Duchy. Where do you hail from?", "ANCESTRY") as anything in new_origins
