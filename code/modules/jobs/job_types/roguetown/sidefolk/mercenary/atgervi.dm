@@ -1,11 +1,11 @@
 /datum/advclass/mercenary/atgervi
-	name = "Atgervi"
+	name = "Atgervi Varangian"
 	tutorial = "You are a Varangian of the Gronn Highlands. Warrior-Traders most known for their exploits into the Raneshen Empire, which will be forever remembered by historians."
 	allowed_sexes = list(MALE, FEMALE)
 
 	outfit = /datum/outfit/job/roguetown/mercenary/atgervi
 	subclass_languages = list(/datum/language/gronnic)
-	cmode_music = 'sound/music/combat_vagarian.ogg'
+	cmode_music = sound("sound/music/combat_vagarian.ogg")
 	class_select_category = CLASS_CAT_GRONN
 	category_tags = list(CTAG_MERCENARY, CTAG_MERCPARTY_VANGUARD)
 	traits_applied = list(TRAIT_MEDIUMARMOR)
@@ -93,7 +93,7 @@
 
 	outfit = /datum/outfit/job/roguetown/mercenary/atgervi_shaman
 	subclass_languages = list(/datum/language/gronnic)
-	cmode_music = 'sound/music/combat_shaman2.ogg'
+	cmode_music = sound("sound/music/combat_shaman2.ogg")
 	class_select_category = CLASS_CAT_GRONN
 	category_tags = list(CTAG_MERCENARY, CTAG_MERCPARTY_BULWARK)
 	traits_applied = list(TRAIT_STRONGBITE, TRAIT_CIVILIZEDBARBARIAN, TRAIT_CRITICAL_RESISTANCE, TRAIT_NOPAINSTUN)
@@ -151,6 +151,8 @@
 						id = /obj/item/clothing/neck/roguetown/psicross/inhumen/gronn/spider
 			else
 				id = /obj/item/clothing/neck/roguetown/psicross/inhumen/gronn //TA EDIT END
+			H.mind?.AddSpell(new /datum/action/cooldown/spell/minion_order)
+			H.mind?.AddSpell(new /datum/action/cooldown/spell/gravemark)
 		if(/datum/patron/inhumen/graggar)
 			id = /obj/item/clothing/neck/roguetown/psicross/inhumen/graggar/gronn
 		if(/datum/patron/inhumen/matthios)

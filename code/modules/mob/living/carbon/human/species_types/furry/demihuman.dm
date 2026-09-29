@@ -18,6 +18,8 @@
 		/obj/item/bodypart/taur/spider,
 		/obj/item/bodypart/taur/horse,
 		/obj/item/bodypart/taur/goat,
+		/obj/item/bodypart/taur/feline,				//TA-EDIT
+		/obj/item/bodypart/taur/feline_furry		//TA-EDIT
 	)
 	default_features = MANDATORY_FEATURE_LIST
 	use_skintones = TRUE
@@ -70,6 +72,8 @@
 		/datum/customizer/organ/penis/anthro,
 		/datum/customizer/organ/breasts/animal,
 		/datum/customizer/organ/vagina/animal,
+		/datum/customizer/bodypart_feature/pubes,
+		/datum/customizer/bodypart_feature/pits,
 		)
 	body_marking_sets = list(
 		/datum/body_marking_set/none,
@@ -155,6 +159,8 @@
 		"East Raneshen (Nshkormh)" = SKIN_COLOR_LALVESTINE,
 		"Naledi" = SKIN_COLOR_NALEDI,
 		"Naledi South" = SKIN_COLOR_NALEDI_LIGHT,
+		"Naledi West" = SKIN_COLOR_NALEDI_B,
+		"Naledi East" = SKIN_COLOR_NALEDI_D,
 		"Kazengun" = SKIN_COLOR_KAZENGUN,
 		"Gyedzai" = SKIN_COLOR_KAZENGUN
 	)
