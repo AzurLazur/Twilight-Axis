@@ -50,6 +50,16 @@
 
 /mob/living/carbon/human
 	var/obj/structure/shamanic_totem/owned_shamanic_totem
+	var/shamanic_totem_verbs_granted = FALSE
+	var/shamanic_totem_verbs_innate = FALSE
+
+/mob/living/carbon/human/proc/grant_shamanic_totem_verbs(innate = FALSE)
+	if(innate)
+		shamanic_totem_verbs_innate = TRUE
+	if(shamanic_totem_verbs_granted)
+		return
+	shamanic_totem_verbs_granted = TRUE
+	add_verb(src, list(/mob/living/carbon/human/proc/shamanic_totem_manage_roster, /mob/living/carbon/human/proc/shamanic_totem_clear_roster, /mob/living/carbon/human/proc/shamanic_totem_disassemble))
 
 /obj/item/shamanic_totem_block
 	name = "totem block"
@@ -454,8 +464,9 @@
 	totem_blocks.Cut()
 	if(owner?.owned_shamanic_totem == src)
 		owner.owned_shamanic_totem = null
-	if(owner)
+	if(owner && !owner.shamanic_totem_verbs_innate)
 		remove_verb(owner, list(/mob/living/carbon/human/proc/shamanic_totem_manage_roster, /mob/living/carbon/human/proc/shamanic_totem_clear_roster, /mob/living/carbon/human/proc/shamanic_totem_disassemble))
+		owner.shamanic_totem_verbs_granted = FALSE
 	owner = null
 	STOP_PROCESSING(SSobj, src)
 	return ..()
@@ -464,7 +475,7 @@
 	owner = new_owner
 	recipients = list(new_owner)
 	new_owner.owned_shamanic_totem = src
-	add_verb(new_owner, list(/mob/living/carbon/human/proc/shamanic_totem_manage_roster, /mob/living/carbon/human/proc/shamanic_totem_clear_roster, /mob/living/carbon/human/proc/shamanic_totem_disassemble))
+	new_owner.grant_shamanic_totem_verbs()
 	to_chat(new_owner, span_notice("I start a totem. I can choose who it shelters with a quiet word."))
 
 /obj/structure/shamanic_totem/proc/add_recipient(mob/living/carbon/human/target)

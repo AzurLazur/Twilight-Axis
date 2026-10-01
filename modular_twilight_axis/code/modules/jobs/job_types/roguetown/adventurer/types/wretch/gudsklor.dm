@@ -38,6 +38,7 @@
 	if(H.mind)
 		for(var/recipe_type in shamanic_totem_block_recipe_types)
 			H.mind.teach_crafting_recipe(recipe_type)
+	H.grant_shamanic_totem_verbs(TRUE)
 
 	head = /obj/item/clothing/head/roguetown/helmet/leather/shaman_hood
 	gloves = /obj/item/clothing/gloves/roguetown/angle/gronnfur
