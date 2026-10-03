@@ -1531,7 +1531,10 @@ var/static/list/shamanic_commit_fold_cache = list()
 			to_chat(user, span_warning("There is already something here!"))
 			return
 	user.visible_message(span_notice("[user] begins planting [src] into the ground."))
-	if(!do_after(user, 2 SECONDS, TRUE, src))
+	user.AddElement(/datum/element/interrupt_on_damage)
+	var/planted = do_after(user, 3 SECONDS, TRUE, src)
+	user.RemoveElement(/datum/element/interrupt_on_damage)
+	if(!planted)
 		return
 	var/turf/T2 = get_turf(src)
 	if(!isfloorturf(T2))
