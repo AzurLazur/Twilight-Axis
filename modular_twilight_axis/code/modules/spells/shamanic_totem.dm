@@ -1,6 +1,6 @@
 #define SHAMANIC_TOTEM_AURA_RANGE 7
 
-#define SHAMANIC_TOTEM_MAX_RECIPIENTS 4
+#define SHAMANIC_TOTEM_MAX_RECIPIENTS 3
 
 #define SHAMANIC_TOTEM_MIN_BLOCKS 3
 
@@ -248,7 +248,7 @@
 	greed_taxed = TRUE
 	commit_buff = null
 	commit_debuff = null
-	commit_blessing_folded = list(STATKEY_STR = 1, STATKEY_PER = 1, STATKEY_SPD = -1)
+	commit_blessing_folded = list(STATKEY_SPD = -1)
 	commit_curse_folded = list(STATKEY_STR = -1, STATKEY_PER = -1)
 
 /obj/item/shamanic_totem_block/baotha
@@ -481,7 +481,7 @@
 /obj/structure/shamanic_totem/proc/add_recipient(mob/living/carbon/human/target)
 	if(!target || (target in recipients))
 		return FALSE
-	if((recipients.len - 1) >= max_recipients)
+	if(recipients.len >= max_recipients)
 		return FALSE
 	recipients += target
 	if(target in active_cursed)
