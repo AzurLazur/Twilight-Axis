@@ -65,7 +65,7 @@
 	name = "totem block"
 	desc = "A carved block humming with totemic power. Set a few of them together on one spot and they awake as a working totem."
 	icon = 'modular_twilight_axis/icons/obj/structures/totem.dmi'
-	icon_state = "Graggar_totem"
+	icon_state = "graggar_totem"
 	w_class = WEIGHT_CLASS_SMALL
 	slot_flags = ITEM_SLOT_HIP | ITEM_SLOT_BACK
 	var/god_name = "Grinning Moose"
@@ -172,7 +172,7 @@
 /obj/item/shamanic_totem_block/graggar
 	name = "moose block"
 	desc = "A carved block covered in red dye all over it, roughly resembling blood drops. There is a small antlers carved on top"
-	icon_state = "Graggar_totem"
+	icon_state = "graggar_totem"
 	god_name = "Grinning Moose"
 	stat_key = STATKEY_STR
 	patron_type = /datum/patron/inhumen/graggar
@@ -199,7 +199,7 @@
 /obj/item/shamanic_totem_block/zizo
 	name = "wolf block"
 	desc = "A carved block covered in white dye, resembling a bone. There is a wolf head carved on top"
-	icon_state = "Zizo_totem"
+	icon_state = "zizo_totem"
 	god_name = "Plotting Wolf"
 	stat_key = null
 	patron_type = /datum/patron/inhumen/zizo
@@ -239,7 +239,7 @@
 /obj/item/shamanic_totem_block/matthios
 	name = "bear block"
 	desc = "A carved block covered in yellow dye, resembling a pile of coins. There is a bear tooth carved on top."
-	icon_state = "Matthios_totem"
+	icon_state = "matthios_totem"
 	god_name = "Starving Bear"
 	stat_key = STATKEY_SPD
 	block_value = 1
@@ -254,7 +254,7 @@
 /obj/item/shamanic_totem_block/baotha
 	name = "leopard block"
 	desc = "A carved block covered in purple dye, resembling a field of roses. There is a feline head carved on top"
-	icon_state = "Baotha_totem"
+	icon_state = "baotha_totem"
 	god_name = "Relishing Leopard"
 	stat_key = STATKEY_INT
 	block_value = 1
@@ -297,7 +297,7 @@
 /obj/item/shamanic_totem_block/dendor
 	name = "Overgrown block"
 	desc = "A carved block overgrown with vines and thorns, with a clawed hand carved on top of it."
-	icon_state = "Dendor_totem"
+	icon_state = "dendor_totem"
 	god_name = "Volfskinned Man"
 	stat_key = STATKEY_PER
 	patron_type = /datum/patron/divine/dendor
@@ -366,7 +366,7 @@
 /obj/item/shamanic_totem_block/abyssor
 	name = "kraken block"
 	desc = "A carved block with a seashell on it, briefly painted with blue dye."
-	icon_state = "Abyssor_totem"
+	icon_state = "abyssor_totem"
 	god_name = "Spiraling Kraken"
 	patron_type = /datum/patron/divine/abyssor
 	stat_key = null
@@ -414,7 +414,7 @@
 		for(var/block_name in counts)
 			. += span_info("[counts[block_name]]x [block_name]")
 		if(length(totem_blocks) < SHAMANIC_TOTEM_MIN_BLOCKS)
-			. += span_warning("Not enough blocks yet — stack at least [SHAMANIC_TOTEM_MIN_BLOCKS] to wake the totem.")
+			. += span_warning("Not enough blocks yet вЂ” stack at least [SHAMANIC_TOTEM_MIN_BLOCKS] to wake the totem.")
 		else
 			. += span_notice("The totem hums with spirit, offering its favor within [SHAMANIC_TOTEM_AURA_RANGE] tiles.")
 			var/list/committed = list()
@@ -1157,7 +1157,7 @@ var/static/list/shamanic_commit_fold_cache = list()
 			owner.energy_add(-drain)
 		next_stamina_drain = world.time + SHAMANIC_TOTEM_STAMINA_DRAIN_INTERVAL
 		if(owner.energy <= 0)
-			to_chat(owner, span_warning("My totem's thirst for my vitality leaves me spent — it will keep draining as long as it stands."))
+			to_chat(owner, span_warning("My totem's thirst for my vitality leaves me spent вЂ” it will keep draining as long as it stands."))
 
 	if(is_dendor_committed())
 		if(world.time >= next_growth_start)
@@ -1351,11 +1351,11 @@ var/static/list/shamanic_commit_fold_cache = list()
 	name = "Packed totem"
 	desc = "A large, unwieldy wooden structure covered with stiched up sacks. You can see small painted parts between rugged cloth."
 	icon = 'modular_twilight_axis/icons/obj/structures/totem.dmi'
-	icon_state = "Totem2"
+	icon_state = "totem2"
 	experimental_onback = TRUE
 	lefthand_file = 'modular_twilight_axis/icons/obj/structures/totem_hand.dmi'
 	righthand_file = 'modular_twilight_axis/icons/obj/structures/totem_hand.dmi'
-	item_state = "Totem1"
+	item_state = "totem1"
 	mob_overlay_icon = 'modular_twilight_axis/icons/obj/structures/totem_hand.dmi'
 	inhand_x_dimension = 64
 	inhand_y_dimension = 64
@@ -1378,7 +1378,7 @@ var/static/list/shamanic_commit_fold_cache = list()
 /obj/item/shamanic_totem/get_mechanics_examine(mob/user)
 	. = ..()
 	. += span_info("Activate it in your hand to plant it back into the ground, with every stacked block intact.")
-	. += span_info("It can be strapped to your back to carry, but actually wielding it — to plant it or swing it — takes both hands.")
+	. += span_info("It can be strapped to your back to carry, but actually wielding it вЂ” to plant it or swing it вЂ” takes both hands.")
 	. += span_info("Only the totem's owner can plant or reclaim it. Anyone without training in Spiritism who picks it up will be hurt for their trouble.")
 
 /obj/item/shamanic_totem/Initialize(mapload)
@@ -1390,7 +1390,7 @@ var/static/list/shamanic_commit_fold_cache = list()
 		var/saved_icon = icon
 		var/saved_state = icon_state
 		icon = 'modular_twilight_axis/icons/obj/structures/totem_hand.dmi'
-		icon_state = "Totem1"
+		icon_state = "totem1"
 		var/result = ..()
 		icon = saved_icon
 		icon_state = saved_state
@@ -1399,7 +1399,7 @@ var/static/list/shamanic_commit_fold_cache = list()
 	var/list/used_prop = prop
 	var/used_mask = 'icons/roguetown/helpers/inhand_64.dmi'
 	var/icon/returned = icon(used_mask, "blank")
-	var/icon/totem_icon = icon('modular_twilight_axis/icons/obj/structures/totem_hand.dmi', "Totem1")
+	var/icon/totem_icon = icon('modular_twilight_axis/icons/obj/structures/totem_hand.dmi', "totem1")
 
 	if(!totem_icon)
 		return
