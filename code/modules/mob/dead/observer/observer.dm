@@ -1379,4 +1379,5 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 
 	return entry
 
+#undef OBSERVER_STEP_TICKS
 #undef ROGUE_GHOST_MAX_BODY_RANGE // TA EDIT END
