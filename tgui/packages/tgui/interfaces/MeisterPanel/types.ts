@@ -106,6 +106,7 @@ export type Data = {
   bathhouse_tithe_round_total: number;
   bathhouse_ordinance_cooldown_seconds: number;
   bathhouse_ordinance_cooldown_minutes: number;
+  ta_map: string;
 };
 
 export type TabKey =
