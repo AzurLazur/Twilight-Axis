@@ -50,6 +50,11 @@ GLOBAL_LIST_INIT(zone_translations, list(
 		return FALSE
 
 	var/mob/living/carbon/vomiter = user
+	if(vomiter.stat != CONSCIOUS)
+		return FALSE
+	if(vomiter.nutrition <= 50 && vomiter.hydration <= 50)
+		to_chat(vomiter, span_warning("There's nothing left to throw up!"))
+		return FALSE
 
 	if(vomiter.has_stress_event(/datum/stressevent/vomitself))
 		to_chat(vomiter, span_warning("I already puked once. It won't come out!"))

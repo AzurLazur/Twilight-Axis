@@ -638,6 +638,8 @@
 
 
 /mob/living/carbon/proc/vomit(lost_nutrition = 50, blood = FALSE, stun = TRUE, distance = 1, message = TRUE, toxic = FALSE, harm = FALSE, force = FALSE)
+	if(stat == DEAD)
+		return FALSE
 	if(HAS_TRAIT(src, TRAIT_IRONMAN))
 		return TRUE
 
@@ -655,7 +657,7 @@
 
 	var/atom/movable/vomit_source = vomitrelay ? vomitrelay : src
 
-	if(nutrition <= 50 && !blood)
+	if(nutrition <= 50 && hydration <= 50 && !blood)
 		if(message)
 			emote("gag")
 		if(stun)
@@ -708,9 +710,9 @@
 	blur_eyes(10)
 
 	if(!blood)
-		if(nutrition > 50)
-			adjust_nutrition(-lost_nutrition)
-			adjust_hydration(-lost_nutrition)
+		if(nutrition > 50 || hydration > 50)
+			adjust_nutrition(-min(lost_nutrition, max(nutrition - 50, 0)))
+			adjust_hydration(-min(lost_nutrition, max(hydration - 50, 0)))
 //adjustToxLoss(-3)
 	if(harm)
 		adjustBruteLoss(3)
