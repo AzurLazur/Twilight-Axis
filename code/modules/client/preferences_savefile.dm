@@ -1281,8 +1281,10 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 	WRITE_FILE(S["statpack"] , statpack.type)
 
 	write_clean_virtue_paths(S, virtue ? virtue.type : /datum/virtue/none, virtuetwo ? virtuetwo.type : /datum/virtue/none, virtue_origin ? virtue_origin.type : /datum/virtue/none, virtue ? virtue.picked_choices : null, virtuetwo ? virtuetwo.picked_choices : null)
-	WRITE_FILE(S["quirklesser"], quirklesser ? quirklesser.type : /datum/quirk/none)
-	WRITE_FILE(S["quirkgreater"], quirkgreater ? quirkgreater.type : /datum/quirk/none)
+	var/quirklesser_save_type = quirklesser ? quirklesser.type : /datum/quirk/none
+	var/quirkgreater_save_type = quirkgreater ? quirkgreater.type : /datum/quirk/none
+	WRITE_FILE(S["quirklesser"], quirklesser_save_type)
+	WRITE_FILE(S["quirkgreater"], quirkgreater_save_type)
 
 	WRITE_FILE(S["race_bonus"], race_bonus)
 	var/combat_music_save_type = default_cmusic_type // TA EDIT START

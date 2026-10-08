@@ -439,7 +439,6 @@ GLOBAL_LIST_INIT(department_radio_keys, list(
 				if(!(listener in listening))
 					listening[listener] = "v"
 	var/alist/admin_listeners = alist()
-	var/do_ghost_protection = has_ghost_protection(src)
 	if(Zs_all)
 		for(var/mob/potential_listener as anything in GLOB.player_list)
 			if(!potential_listener.client?.prefs)
@@ -448,10 +447,6 @@ GLOBAL_LIST_INIT(department_radio_keys, list(
 				continue
 			if(get_dist(potential_listener, src) > message_range) //they're out of range of normal hearing
 				continue // don't check ghostwhisper prefs here, those are for admins
-			if(do_ghost_protection && isobserver(potential_listener))
-				var/mob/dead/observer/potential_observer = potential_listener
-				if(!potential_observer.bypasses_ghost_protection(potential_listener))
-					continue
 			if(!is_in_zweb(src.z,potential_listener.z))
 				continue
 			listening |= potential_listener
@@ -469,11 +464,6 @@ GLOBAL_LIST_INIT(department_radio_keys, list(
 			continue
 		listening |= observer
 		admin_listeners[observer] = TRUE
-	if(do_ghost_protection) // don't loop over the whole listening list unless we really have to
-		for(var/mob/dead/observer/ghost in listening) // a necessary evil so ghosts don't show up in the seen log
-			if(ghost.bypasses_ghost_protection())
-				continue
-			listening -= ghost
 	log_seen(src, null, listening, message, SEEN_LOG_SAY)
 
 	var/eavesdropping
@@ -543,22 +533,6 @@ GLOBAL_LIST_INIT(department_radio_keys, list(
 	var/image/I = image('icons/mob/talk.dmi', src, "[bubble_type][say_test(message)]", FLY_LAYER)
 	I.appearance_flags = APPEARANCE_UI_IGNORE_ALPHA
 	INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(flick_overlay), I, speech_bubble_recipients, 30)
-
-	//Listening gets trimmed here if a vocal bark's present. If anyone ever makes this proc return listening, make sure to instead initialize a copy of listening in here to avoid wonkiness
-	if(SEND_SIGNAL(src, COMSIG_MOVABLE_QUEUE_BARK, listening, args) || vocal_bark || vocal_bark_id)
-		var/list/hears_barks = list()
-		for(var/mob/M in listening)
-			if(!M.client?.prefs?.mute_barks)
-				hears_barks += M
-		var/is_yell = Zs_yell || Zs_all
-		var/barks = min(round((length(message) / vocal_speed)) + 1, BARK_MAX_BARKS)
-		var/total_delay = 0
-		vocal_current_bark = world.time
-		for(var/i in 1 to barks)
-			if(total_delay > BARK_MAX_TIME)
-				break
-			addtimer(CALLBACK(src, TYPE_PROC_REF(/atom/movable, bark), hears_barks, message_range, (vocal_volume * (is_yell ? 1.5 : 1)), BARK_DO_VARY(vocal_pitch, vocal_pitch_range), vocal_current_bark), total_delay)
-			total_delay += rand(DS2TICKS(vocal_speed / BARK_SPEED_BASELINE), DS2TICKS(vocal_speed / BARK_SPEED_BASELINE) + DS2TICKS((vocal_speed / BARK_SPEED_BASELINE) * (is_yell ? 0.5 : 1))) TICKS
 
 /mob/proc/binarycheck()
 	return FALSE
